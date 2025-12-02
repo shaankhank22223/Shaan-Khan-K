@@ -1,65 +1,67 @@
-const { downloadVideo } = require('priyansh-all-dl');
-const axios = require("axios");
-const fs = require("fs-extra");
-const tempy = require('tempy');
-
-module.exports.config = {
-    name: "igautodownload",
-    version: "1.0.0",
+module.exports = {
+  config: {
+    name: "linkAutoDownload",
+    version: "1.3.0",
     hasPermssion: 0,
-    credits: "Priyansh Rajput",
-    description: "Downloads Instagram video from HD link provided",
-    commandCategory: "utility",
-    usages: "[Instagram video URL]",
+    credits: "ARIF BABU", // ⚠️ DO NOT CHANGE THIS CREDIT
+    description:
+      "Automatically detects links in messages and downloads the file.",
+    commandCategory: "Utilities",
+    usages: "",
     cooldowns: 5,
-    dependencies: {
-        "priyansh-all-dl": "latest",
-        "axios": "0.21.1",
-        "fs-extra": "10.0.0",
-        "tempy": "0.4.0"
+  },
+
+  // ⛔ CREDIT PROTECTION — DO NOT TOUCH
+  onLoad: function () {
+    const fs = require("fs");
+    const path = __filename;
+    const fileData = fs.readFileSync(path, "utf8");
+
+    // Check if credits modified
+    if (!fileData.includes('credits: "ARIF BABU"')) {
+      console.log("\n❌ ERROR: Credits Badle Gaye Hain! File Disabled ❌\n");
+      process.exit(1); // stop bot
     }
-};
+  },
+  // ---------------------
 
-module.exports.handleEvent = async function({ api, event }) {
-            if (event.type === "message" && event.body) {
-                if (event.body.startsWith("https://www.instagram.com/share/") || event.body.startsWith("https://www.instagram.com/reel/")) {
-            try {
+  run: async function ({ events, args }) {},
 
-            const videoInfo = await downloadVideo(event.body);
-            const hdLink = videoInfo.video;
-            const response = await axios.get(hdLink, { responseType: 'stream' });
-            const tempFilePath = tempy.file({ extension: 'mp4' });
-            const writer = fs.createWriteStream(tempFilePath);
-            response.data.pipe(writer);
+  handleEvent: async function ({ api, event, args }) {
+    const axios = require("axios");
+    const fs = require("fs-extra");
+    const { alldown } = require("arif-babu-downloadr");
 
-            writer.on('finish', async () => {
-                const attachment = fs.createReadStream(tempFilePath);
-                await api.sendMessage({
-                    attachment,
-                    body: "Here's the video you requested:"
-                }, event.threadID, (err) => {
-                    if (err) console.error("Error sending message:", err);
-                });
-                fs.unlinkSync(tempFilePath);
+    const content = event.body || "";
+    const body = content.toLowerCase();
 
-            });
+    if (body.startsWith("https://")) {
+      try {
+        api.setMessageReaction("⏳", event.messageID, () => {}, true);
 
-            writer.on('error', (err) => {
-                console.error("Error writing file:", err);
-                api.sendMessage("An error occurred while processing the video. Please try again later.", event.threadID, event.messageID);
-            });
-        } catch (error) {
-            console.error('Error downloading Instagram video:', error);
-            api.sendMessage("An error occurred while downloading the Instagram video. Please try again later.", event.threadID, event.messageID);
-        }
+        const data = await alldown(content);
+        const { high } = data.data;
+
+        api.setMessageReaction("✅", event.messageID, () => {}, true);
+
+        const videoBuffer = (
+          await axios.get(high, { responseType: "arraybuffer" })
+        ).data;
+
+        const filePath = __dirname + "/cache/auto.mp4";
+        fs.writeFileSync(filePath, Buffer.from(videoBuffer));
+
+        return api.sendMessage(
+          {
+            body: "🥀𝐘𝐄 𝐋𝐎 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃 𝐇𝐎𝐆𝐈 𝐀𝐏𝐊𝐈 𝐈𝐍𝐒𝐓𝐀𝐆𝐀𝐌 𝐕𝐈𝐃𝐄𝐎🕊️",
+            attachment: fs.createReadStream(filePath),
+          },
+          event.threadID,
+          event.messageID
+        );
+      } catch (e) {
+        return api.sendMessage("❌ Error in auto download!", event.threadID);
+      }
     }
-}
-};
-
-module.exports.run = async function ({ api, event }) {
-  return api.sendMessage(
-    `This command does not support direct execution.`,
-    event.threadID,
-    event.messageID,
-  );
+  },
 };
