@@ -95,7 +95,7 @@ module.exports.handleEvent = async function({ api, event, args, Threads, Users }
    };
 
    if ((event.body.toLowerCase() == "chumma de") || (event.body.toLowerCase() == "kiss me")) {
-     return api.sendMessage("️Kis khushi me, Me sirf Apni gf ko kiss karta hu", threadID);
+     return api.sendMessage("️Kis khushi me, Me sirf Apni Shaan Babu ko kiss karti hu", threadID);
    };
 
    if ((event.body.toLowerCase() == "nice") || (event.body.toLowerCase() == "thank you") || (event.body.toLowerCase() == "thank you bot") || (event.body.toLowerCase() == "thank you maliha")) {
@@ -241,7 +241,7 @@ module.exports.handleEvent = async function({ api, event, args, Threads, Users }
 
 ${rand}                                        
 
-𝗖𝗿𝗲𝗱𝗶𝘁𝘀:𒁍≛⃝𝑺𝑯𝑨𝑨𝑵 𝑲𝑯𝑨𝑵 𝑲 ❥||ㅎ
+𝗖𝗿𝗲𝗱𝗶𝘁𝘀:𒁍≛⃝𝑺𝑯𝑨𝑨𝑵 𝑨𝑵𝑫 𝑯𝑨𝑵𝑬𝑬𝑭 ❥||ㅎ
 
 ❖•S━━━━━💞━━━━━A•❖`
   }
